@@ -32,8 +32,6 @@ public class MemoService {
         }
     }
 
-
-
     // Update
     @Transactional
     public Long update(Long id, MemoRequestDto requestDto) {
@@ -49,5 +47,4 @@ public class MemoService {
             return 0L;
         }
     }
-
 }
