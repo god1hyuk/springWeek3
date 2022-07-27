@@ -1,9 +1,6 @@
 package com.sparta.springweek3.controller;
 
-import com.sparta.springweek3.models.Memo;
-import com.sparta.springweek3.models.MemoRepository;
-import com.sparta.springweek3.models.MemoRequestDto;
-import com.sparta.springweek3.models.MemoResponseDto;
+import com.sparta.springweek3.models.*;
 import com.sparta.springweek3.service.MemoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,48 +13,54 @@ import java.util.Optional;
 public class MemoController {
 
     private final MemoRepository memoRepository;
-
     private final MemoService memoService;
 
-    // Find all
+    // Get all memos
     @GetMapping("/api/memos")
     public MemoResponseDto getAllMemos() {
-        List<Memo> memoList = memoRepository.findAllByOrderByModifiedAtDesc();
-        MemoResponseDto responseDto = new MemoResponseDto(memoList);
-        return responseDto;
-    }
-
-    // Find one
-    @GetMapping("/api/memos/{id}")
-    public Optional<Memo> getMemo(@PathVariable Long id) {
-        return memoRepository.findById(id);
-    }
-
-    // Post
-    @PostMapping("/api/memos")
-    public Memo createMemo(@RequestBody MemoRequestDto requestDto) {
-        Memo memo = new Memo(requestDto);
-        return memoRepository.save(memo);
+        List<Memo> memos = memoRepository.findAllByOrderByModifiedAtDesc();
+        return memoService.getMemos(memos);
     }
 
     // Password Validation
     @PostMapping("/api/memos/{id}")
-    public boolean confirmPassword(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        return memoService.confirm(id, requestDto);
+    public MemoResponseDto confirmPassword(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
+        ValidDto validDto = new ValidDto(requestDto);
+        MemoResponseDto responseDto = new MemoResponseDto(memoService.confirm(id, validDto));
+        responseDto.setSuccess(true);
+        return responseDto;
     }
 
-    // Update
+    // Post memo
+    @PostMapping("/api/memos")
+    public MemoResponseDto createMemo(@RequestBody MemoRequestDto requestDto) {
+        Memo memo = new Memo(requestDto);
+        MemoResponseDto responseDto = new MemoResponseDto(memoRepository.save(memo));
+        responseDto.setSuccess(true);
+        return responseDto;
+    }
+
+    // Get memo
+    @GetMapping("/api/memos/{id}")
+    public MemoResponseDto getMemo(@PathVariable Long id) {
+        Optional<Memo> memo = memoRepository.findById(id);
+        return memoService.getMemos(memo);
+    }
+
+    // Update memo
     @PutMapping("/api/memos/{id}")
-    public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        memoService.update(id, requestDto);
-        return id;
+    public MemoResponseDto updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
+        MemoResponseDto responseDto = new MemoResponseDto(memoService.update(id, requestDto));
+        responseDto.setSuccess(true);
+        return responseDto;
     }
 
-    // Delete
+    // Delete memo
     @DeleteMapping("/api/memos/{id}")
-    public Long deleteMomo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
+    public MemoResponseDto deleteMomo(@PathVariable Long id) {
         memoRepository.deleteById(id);
-        return id;
+        MemoResponseDto responseDto = new MemoResponseDto(true);
+        responseDto.setSuccess(true);
+        return responseDto;
     }
-
 }

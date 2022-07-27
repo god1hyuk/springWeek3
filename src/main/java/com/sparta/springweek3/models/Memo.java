@@ -41,9 +41,4 @@ public class Memo extends Timestamped {
         this.password = requestDto.getPassword();
         this.content = requestDto.getContent();
     }
-
-    public void confirm(MemoRequestDto requestDto) {
-        this.password = requestDto.getPassword();
-    }
-
 }
